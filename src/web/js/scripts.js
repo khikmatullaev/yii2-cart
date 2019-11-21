@@ -5,6 +5,7 @@ if (typeof dvizh == "undefined" || !dvizh) {
 dvizh.cart = {
     init: function () {
 
+        productElementCount = '[data-role=product-element-count]';
         cartElementsCount = '[data-role=cart-element-count]';
         buyElementButton = '[data-role=cart-buy-button]';
         deleteElementButton = '[data-role=cart-delete-button]';
@@ -13,34 +14,113 @@ dvizh.cart = {
         dvizh.cart.csrf = jQuery('meta[name=csrf-token]').attr("content");
         dvizh.cart.csrf_param = jQuery('meta[name=csrf-param]').attr("content");
 
+
+
+
         jQuery(document).on('change', cartElementsCount, function () {
 
             var self = this,
                 url = jQuery(self).data('href');
 
             if (jQuery(self).val() < 0) {
-                jQuery(self).val('0');
+              jQuery(self).val('0');
                 return false;
             }
 
             cartElementId = jQuery(self).data('id');
             cartElementCount = jQuery(self).val();
+            cartQuantityUrl = jQuery(self).data('cart-quantity-url');
 
-            dvizh.cart.changeElementCount(cartElementId, cartElementCount, url);
-            dvizh.cart.changeElementCost(cartElementId, cartElementCount, url);
+            jQuery.ajax({
+                url: cartQuantityUrl,
+                type: "post",
+                data: { id: cartElementId, quantity: cartElementCount },
+                success: function (answer) {
+                  json = JSON.parse(answer);
+
+                  if( json.bool == true ) {
+                        dvizh.cart.changeElementCount(cartElementId, cartElementCount, url);
+                        dvizh.cart.changeElementCost(cartElementId, cartElementCount, url);
+                    }else{
+                      //alert(json.error);
+                      Swal({
+                          type: 'error',
+                          title: 'Upozornění',
+                          text: json.error,
+                      });
+                      jQuery(self).val(json.quantity);
+                    }
+                }
+            });
+        });
+
+
+        jQuery(document).on('change', productElementCount, function () {
+
+            var self = jQuery(".dvizh-cart-element-before-count");
+                url = jQuery(self).data('href'),
+                count_product = jQuery(self).val();
+
+            if (jQuery(self).val() < 0) {
+              jQuery(self).val('0');
+                return false;
+            }
+
+
+
+            setTimeout(function(){
+                cartElementId = jQuery(self).data('id');
+                cartElementCount = jQuery(self).val();
+                cartQuantityUrl = jQuery(self).data('cart-quantity-url');
+                var piece_price = jQuery(".dvizh-shop-price").html();
+
+                console.log(piece_price + " " + count_product);
+                console.log("sum " + piece_price * count_product);
+                jQuery(".dvizh-shop-price").hide();
+                jQuery(".price-product-sum").show();
+                jQuery(".price-product-sum").html(piece_price*count_product);
+            },500);
+
         });
 
         jQuery(document).on('click', buyElementButton, function () {
 
+            if( jQuery('#options-exist-flag').val() && !jQuery(".dvizh-option-values-before").val() ) {
+                alert('Choose the options');
+                return false;
+            }
+
             var self = this,
                 url = jQuery(self).data('url'),
+                productQuantityCheckUrl = jQuery(self).data('product-url'),
+                productOptionQuantityCheckUrl = jQuery(self).data('product-option-url'),
                 itemModelName = jQuery(self).data('model'),
                 itemId = jQuery(self).data('id'),
                 itemCount = jQuery(self).data('count'),
                 itemPrice = jQuery(self).data('price'),
                 itemOptions = jQuery(self).data('options');
 
-            dvizh.cart.addElement(itemModelName, itemId, itemCount, itemPrice, itemOptions, url);
+            var checkQuantityUrl = jQuery('#options-exist-flag').val() ? productOptionQuantityCheckUrl : productQuantityCheckUrl;
+
+            jQuery.ajax({
+                url: checkQuantityUrl,
+                type: "post",
+                data: { productId: itemId, productOptionId: itemOptions, quantity: itemCount },
+                success: function (answer) {
+                    json = JSON.parse(answer);
+
+                    if( json.bool == true )
+                        dvizh.cart.addElement(itemModelName, itemId, itemCount, itemPrice, itemOptions, url);
+                    else
+                        //alert(json.error);
+
+                        Swal({
+                            type: 'error',
+                            title: 'Upozornění',
+                            text: json.error,
+                        });
+                }
+            });
 
             return false;
         });
@@ -51,7 +131,7 @@ dvizh.cart = {
                 url = jQuery(self).data('url');
 
             dvizh.cart.truncate(url);
-            
+
             return false;
         });
 
@@ -71,7 +151,7 @@ dvizh.cart = {
 
             return false;
         });
-        
+
         jQuery(document).on('click', '.dvizh-arr', this.changeInputValue);
         jQuery(document).on('change', '.dvizh-cart-element-before-count', this.changeBeforeElementCount);
         jQuery(document).on('change', '.dvizh-option-values-before', this.changeBeforeElementOptions);
@@ -114,7 +194,7 @@ dvizh.cart = {
         return false;
     },
     changeBeforeElementOptions: function () {
-        var id = jQuery(this).data('id');
+      var id = jQuery(this).data('id');
         var filter_id = jQuery(this).data('filter-id');
         var buyButton = jQuery('.dvizh-cart-buy-button' + id);
 
@@ -139,7 +219,8 @@ dvizh.cart = {
         return false;
     },
     changeInputValue: function () {
-        var val = parseInt(jQuery(this).siblings('input').val());
+
+      var val = parseInt(jQuery(this).siblings('input').val());
         var input = jQuery(this).siblings('input');
 
         if (jQuery(this).hasClass('dvizh-downArr')) {
@@ -157,7 +238,7 @@ dvizh.cart = {
         return false;
     },
     changeBeforeElementCount: function () {
-        if (jQuery(this).val() <= 0) {
+      if (jQuery(this).val() <= 0) {
             jQuery(this).val('0');
         }
 
@@ -173,8 +254,8 @@ dvizh.cart = {
         jQuery('.dvizh-cart-element-cost'+cartElementId).html(newCost);
     },
     changeElementCount: function (cartElementId, cartElementCount, url) {
-
         var data = {};
+
         data.CartElement = {};
         data.CartElement.id = cartElementId;
         data.CartElement.count = cartElementCount;
@@ -194,7 +275,30 @@ dvizh.cart = {
         data.CartElement.options = itemOptions;
 
         dvizh.cart.sendData(data, url);
+        const swalWithBootstrapButtons = Swal.mixin({
+            confirmButtonClass: 'btn btn-success modal-cart-redirect',
+            cancelButtonClass: 'btn btn-default',
+            buttonsStyling: false,
+        })
 
+        swalWithBootstrapButtons({
+                title: 'Přidáno do košíku',
+                text: "Produkt byl přidán do košíku.",
+                type: 'success',
+                showCancelButton: true,
+                confirmButtonText: 'Přejít do košíku',
+                cancelButtonText: 'Pokračovat v nákupu',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                window.location.href = baseurl +"order/cart/index";
+            } else if (
+                // Read more about handling dismissals
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+               // close window
+            }
+        });
         return false;
     },
     truncate: function (url) {

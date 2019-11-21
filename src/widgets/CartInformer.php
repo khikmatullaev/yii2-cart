@@ -3,6 +3,7 @@ namespace dvizh\cart\widgets;
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use navatech\language\Translate;
 use yii;
 
 class CartInformer extends \yii\base\Widget
@@ -25,9 +26,9 @@ class CartInformer extends \yii\base\Widget
         }
         
         if ($this->text === NULL) {
-            $this->text = '{c} '. Yii::t('cart', 'on').' {p}';
+            $this->text = '<p style="font-size:14px">V košíku máte celkem {c} ks položek<span class="hide hiddeh"></span></p>'. Translate::cart_total_text().'<span class="pull-right"> {p}</span>';
         }
-        
+
         return true;
     }
 
@@ -37,12 +38,12 @@ class CartInformer extends \yii\base\Widget
 
         if($this->showOldPrice == false | $cart->cost == $cart->getCost(false)) {
             $this->text = str_replace(['{c}', '{p}'],
-                ['<span class="dvizh-cart-count">'.$cart->getCount().'</span>', '<strong class="dvizh-cart-price">'.$cart->getCostFormatted().'</strong>'],
+                ['<span class="dvizh-cart-count">'.$cart->getCount().'</span>', '<strong class="dvizh-cart-price">'.$cart->getCost(false). ',- ' . Translate::total_czk() . '</strong>'],
                 $this->text
             );
         } else {
             $this->text = str_replace(['{c}', '{p}'],
-                ['<span class="dvizh-cart-count">'.$cart->getCount().'</span>', '<strong class="dvizh-cart-price"><s>'.round($cart->getCost(false)).'</s>'.$cart->getCostFormatted().'</strong>'],
+                ['<span class="dvizh-cart-count">'.$cart->getCount().'</span>', '<strong class="dvizh-cart-price"><s>'.round($cart->getCost(false)).'</s>,- '.$cart->getCostFormatted().'</strong>'],
                 $this->text
             );
         }

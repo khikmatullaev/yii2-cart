@@ -1,6 +1,7 @@
 <?php
 namespace dvizh\cart\models\tools;
 
+use dvizh\cart\models\Cart;
 use yii\web\Session;
 use yii;
 
@@ -34,5 +35,29 @@ class CartQuery extends \yii\db\ActiveQuery
         }
         
         return $one;
+    }
+
+    public function userId()
+    {
+        $session = yii::$app->session;
+
+        if( !$userId = yii::$app->user->id )
+            $userId = $session->get('tmp_user_id');
+
+        return $userId;
+    }
+
+    public function updateUserCart($tempUserId)
+    {
+        Cart::deleteAll(['user_id' => Yii::$app->user->getId()]);
+        $one = Cart::find()->where(['tmp_user_id' => $tempUserId])->one();
+
+        if( !empty($one) )
+        {
+            $one->user_id = Yii::$app->user->getId();
+            $one->tmp_user_id = '';
+
+            $one->save(false);
+        }
     }
 }

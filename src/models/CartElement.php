@@ -59,6 +59,24 @@ class CartElement extends \yii\db\ActiveRecord implements Element
         return $model;
     }
 
+    public function getCartElementOption()
+    {
+        $model = '\\'.$this->model;
+
+        if( is_string($this->model) && class_exists($this->model) )
+        {
+            $productModel = new $model();
+            if ($productModel = $productModel::findOne($this->item_id)) {
+                $model = $productModel;
+            }
+
+            return $model->getProductOption($this->getOptions());
+
+        } else {
+            throw new \yii\base\Exception('Unknow element model');
+        }
+    }
+
     public function getModelName()
     {
         return $this->model;

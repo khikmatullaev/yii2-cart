@@ -88,7 +88,7 @@ class Cart extends Component
 
     public function putWithPrice(\dvizh\cart\interfaces\CartElement $model, $price = 0, $count = 1, $options = [], $comment = null)
     {
-        if (!$elementModel = $this->cart->getElement($model, $options, $price)) {
+        if (!$elementModel = $this->cart->getElementByPrice($model, $price, $options)) {
             $elementModel = $this->element;
             $elementModel->setCount((int)$count);
             $elementModel->setPrice($price);
@@ -250,5 +250,42 @@ class Cart extends Component
         $this->cost = $this->cart->getCost();
 
         return true;
+    }
+
+    public function getProductQuantity($productId)
+    {
+        foreach( $this->getElements() as $value )
+            if( $value->getItemId() == $productId )
+                return $value->getCount();
+
+        return 0;
+    }
+
+    public function getProductQuantityWithOption($productId, $productOptionId)
+    {
+        foreach( $this->getElements() as $value )
+            if( ($value->getItemId() == $productId) && ($value->getOptions() == $productOptionId) )
+                return $value->getCount();
+
+        return 0;
+    }
+
+    private function inOptions($json, $id)
+    {
+        foreach( $json as $key => $value )
+            if( $value == $id )
+                return true;
+
+        return false;
+    }
+
+    public function currentUserId()
+    {
+        return $this->cart->userId();
+    }
+
+    public function updateUserCart($tempUserId)
+    {
+        $this->cart->updateUserCart($tempUserId);
     }
 }

@@ -18,7 +18,19 @@ class Cart extends \yii\db\ActiveRecord implements CartInterface
         $query = new tools\CartQuery(get_called_class());
         return $query->my();
     }
-    
+
+    public function userId()
+    {
+        $query = new tools\CartQuery(get_called_class());
+        return $query->userId();
+    }
+
+    public function updateUserCart($tempUserId)
+    {
+        $query = new tools\CartQuery(get_called_class());
+        return $query->updateUserCart($tempUserId);
+    }
+
     public function put(\dvizh\cart\interfaces\Element $elementModel)
     {
         $elementModel->hash = self::_generateHash($elementModel->model, $elementModel->price, $elementModel->getOptions());
@@ -42,7 +54,12 @@ class Cart extends \yii\db\ActiveRecord implements CartInterface
         $price = empty($price) ? $model->getCartPrice() : $price;
         return $this->getElements()->where(['hash' => $this->_generateHash(get_class($model), $price, $options), 'item_id' => $model->getCartId()])->one();
     }
-    
+
+    public function getElementByPrice(\dvizh\cart\interfaces\CartElement $model, $price, $options = [])
+    {
+        return $this->getElements()->where(['hash' => $this->_generateHash(get_class($model), $price, $options), 'item_id' => $model->getCartId()])->one();
+    }
+
     public function getElementsByModel(\dvizh\cart\interfaces\CartElement $model)
     {
         return $this->getElements()->andWhere(['model' => get_class($model), 'item_id' => $model->getCartId()])->all();

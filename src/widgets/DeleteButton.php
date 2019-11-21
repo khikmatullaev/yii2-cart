@@ -3,6 +3,7 @@ namespace dvizh\cart\widgets;
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use navatech\language\Translate;
 
 class DeleteButton extends \yii\base\Widget
 {
@@ -27,12 +28,12 @@ class DeleteButton extends \yii\base\Widget
 
     public function run()
     {
-        return Html::a($this->text, [$this->deleteElementUrl],
+        return Html::a(Html::tag('span', '', ['class' => 'lnr icon-trash2']), [$this->deleteElementUrl],
             [
                 'data-url' => Url::toRoute($this->deleteElementUrl),
                 'data-role' => 'cart-delete-button',
                 'data-line-selector' => $this->lineSelector,
-                'class' => 'dvizh-cart-delete-button ' . $this->cssClass,
+                //'class' => 'dvizh-cart-delete-button ' . $this->cssClass,
                 'data-id' => $this->model->getId()
             ]);
     }

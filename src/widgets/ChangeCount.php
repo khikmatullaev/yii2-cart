@@ -14,6 +14,7 @@ class ChangeCount extends \yii\base\Widget
     public $defaultValue = 1;
     public $showArrows = true;
     public $actionUpdateUrl = '/cart/element/update';
+    public $cartQuantityUrl = '/product/enough-cart-element-quantity';
     public $customView = false; // for example '@frontend/views/custom/changeCountLayout'
 
     public function init()
@@ -28,26 +29,29 @@ class ChangeCount extends \yii\base\Widget
     public function run()
     {
         if($this->showArrows) {
-            $downArr = Html::a($this->downArr, '#', ['class' => 'dvizh-arr dvizh-downArr']);
-            $upArr = Html::a($this->upArr, '#', ['class' => 'dvizh-arr dvizh-upArr']);
+            $downArr = Html::tag('span', Html::button(Html::tag('span', "", ['class' => "glyphicon glyphicon-minus"]),  ['class' => 'btn btn-default btn-number']), ['class' => "dvizh-arr dvizh-downArr input-group-btn"]);
+            $upArr =  Html::tag('span', Html::button(Html::tag('span', "", ['class' => "glyphicon glyphicon-plus"]),   ['class' => 'btn btn-default btn-number']), ['class' => "dvizh-arr dvizh-upArr input-group-btn"]);
+            //Html::tag('span', "", ['class' => "glyphicon glyphicon-minus"]);
         } else {
             $downArr = $upArr = '';
         }
-        
+
         if(!$this->model instanceof \dvizh\cart\interfaces\CartElement) {
             $input = Html::activeTextInput($this->model, 'count', [
                 'type' => 'number',
-                'class' => 'dvizh-cart-element-count',
+                'class' => 'dvizh-cart-element-count form-control input-number',
                 'data-role' => 'cart-element-count',
                 'data-line-selector' => $this->lineSelector,
                 'data-id' => $this->model->getId(),
                 'data-href' => Url::toRoute($this->actionUpdateUrl),
+                'data-cart-quantity-url' => Url::toRoute($this->cartQuantityUrl),
             ]);
         } else {
             $input = Html::input('number', 'count', $this->defaultValue, [
                 'class' => 'dvizh-cart-element-before-count',
                 'data-line-selector' => $this->lineSelector,
                 'data-id' => $this->model->getCartId(),
+                'data-role' => 'product-element-count',
             ]);
         }
         
@@ -57,7 +61,7 @@ class ChangeCount extends \yii\base\Widget
                 'defaultValue' => $this->defaultValue,
             ]);
         } else {
-            return Html::tag('div', $downArr.$input.$upArr, ['class' => $this->cssClass]);
+            return Html::tag('div', $downArr.$input.$upArr, ['class' => $this->cssClass. " input-group"]);
         }
     }
 }

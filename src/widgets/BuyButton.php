@@ -3,6 +3,7 @@ namespace dvizh\cart\widgets;
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use navatech\language\Translate;
 use yii;
 
 class BuyButton extends \yii\base\Widget
@@ -16,6 +17,8 @@ class BuyButton extends \yii\base\Widget
     public $htmlTag = 'a';
     public $options = null;
     public $addElementUrl = '/cart/element/create';
+    public $productQuantityUrl = '/product/enough-product-quantity';
+    public $productOptionQuantityUrl = '/product/enough-product-option-quantity';
 
     public function init()
     {
@@ -28,7 +31,7 @@ class BuyButton extends \yii\base\Widget
         }
         
         if ($this->text === NULL) {
-            $this->text = Yii::t('cart', 'Buy');
+            $this->text = Translate::cart_buy();
         }
 
         if ($this->cssClass === NULL) {
@@ -50,6 +53,8 @@ class BuyButton extends \yii\base\Widget
             'class' => "dvizh-cart-buy-button dvizh-cart-buy-button{$this->model->getCartId()} {$this->cssClass}",
             'data-id' => $model->getCartId(),
             'data-url' => Url::toRoute($this->addElementUrl),
+            'data-product-url' => Url::toRoute($this->productQuantityUrl),
+            'data-product-option-url' => Url::toRoute($this->productOptionQuantityUrl),
             'data-role' => 'cart-buy-button',
             'data-count' => $this->count,
             'data-price' => (int)$this->price,

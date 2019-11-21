@@ -4,17 +4,29 @@ use dvizh\cart\widgets\TruncateButton;
 use dvizh\cart\widgets\ChangeCount;
 use dvizh\cart\widgets\CartInformer;
 use dvizh\cart\widgets\ChangeOptions;
+use dvizh\shop\widgets\ShowPrice;
+use navatech\language\Translate;
 
-$this->title = yii::t('cart', 'Cart');
+$this->title = Translate::cart_title();
 ?>
 
 <div class="cart">
-    <h1><?= yii::t('cart', 'Cart'); ?></h1>
+    <h1><?= Translate::cart_title() ?></h1>
+
+    <?=\dvizh\cart\widgets\ElementsList::widget(['type' => \dvizh\cart\widgets\ElementsList::TYPE_FULL])?>
+
+
     <?php foreach($elements as $element) { ?>
         <div class="row">
             <div class="col-lg-6 col-xs-6">
-                <strong><?=$element->getModel()->getCartName();?> (<?=$element->getModel()->getCartPrice();?> р.)</strong>
-                <?=ChangeOptions::widget(['model' => $element, 'type' => 'radio']); ?>
+                <strong><?=$element->getModel()->getCartName();?> (
+                    <?=ShowPrice::widget(['model' => $element]);?>
+                )</strong>
+                <br>
+
+                <strong><?= $element->getCartElementOption()?></strong>
+                <br><br>
+
             </div>
             <div class="col-lg-4 col-xs-4">
                 <?=ChangeCount::widget(['model' => $element]);?>
@@ -26,5 +38,8 @@ $this->title = yii::t('cart', 'Cart');
     <?php } ?>
     <div class="total">
         <?=CartInformer::widget(['htmlTag' => 'h3']); ?>
+    </div>
+    <div class="total">
+        <?=TruncateButton::widget(); ?>
     </div>
 </div>

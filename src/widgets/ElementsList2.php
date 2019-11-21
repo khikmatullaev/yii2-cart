@@ -9,7 +9,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii;
 
-class ElementsList extends \yii\base\Widget
+class ElementsList2 extends \yii\base\Widget
 {
     const TYPE_DROPDOWN = 'dropdown';
     const TYPE_FULL = 'full';
@@ -31,7 +31,7 @@ class ElementsList extends \yii\base\Widget
     public $currencyPosition = null;
     public $showCountArrows = true;
     public $columns = 4;
-    public $elementView = 'elementListRow';
+    public $elementView = 'elementListRow2';
     public $controllerActions = ['update' => '/cart/element/update','delete' => '/cart/element/delete'];
 
     public function init()
@@ -98,10 +98,10 @@ class ElementsList extends \yii\base\Widget
         if (empty($elements)) {
             $cart = Html::tag('div', yii::t('cart', 'Your cart empty'), ['class' => 'dvizh-cart dvizh-empty-cart']);
         } else {
-        	$cart = Html::ul($elements, ['item' => function($item, $index) {
+            $cart = Html::ul($elements, ['item' => function($item, $index) {
                 return $this->_row($item);
             }, 'class' => 'dvizh-cart-list']);
-		}
+        }
 
         if (!empty($elements)) {
             $bottomPanel = '';
@@ -124,7 +124,7 @@ class ElementsList extends \yii\base\Widget
         $cart = Html::tag('div', $cart, ['class' => 'dvizh-cart']);
 
         if ($this->type == self::TYPE_DROPDOWN) {
-            $button = Html::a($this->textButton.Html::tag('span', '', ["class" => "caret"]), Url::to(['/order/cart/index']) , ['class' => 'btn dropdown-toggle', 'id' => 'dvizh-cart-drop']);
+            $button = Html::button($this->textButton.Html::tag('span', '', ["class" => "caret"]), ['class' => 'btn dropdown-toggle', 'id' => 'dvizh-cart-drop', 'type' => "button", 'data-toggle' => "dropdown", 'aria-haspopup' => 'true', 'aria-expanded' => "false"]);
             $list = Html::tag('div', $cart, ['class' => 'dropdown-menu', 'aria-labelledby' => 'dvizh-cart-drop']);
             $cart = Html::tag('div', $button.$list, ['class' => 'dvizh-cart-dropdown dropdown']);
         }

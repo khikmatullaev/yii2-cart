@@ -3,6 +3,7 @@ namespace dvizh\cart\widgets;
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use navatech\language\Translate;
 use yii;
 
 class TruncateButton extends \yii\base\Widget
@@ -18,7 +19,7 @@ class TruncateButton extends \yii\base\Widget
         \dvizh\cart\assets\WidgetAsset::register($this->getView());
 
         if ($this->text == NULL) {
-            $this->text = yii::t('cart', 'Truncate');
+            $this->text = Translate::cart_doempty();
         }
         
         return true;
@@ -28,7 +29,7 @@ class TruncateButton extends \yii\base\Widget
     {
         return Html::a(Html::encode($this->text), [$this->truncateCartUrl],
             [
-                'class' => 'dvizh-cart-truncate-button ' . $this->cssClass,
+                'class' => 'dvizh-cart-truncate-button kw-yellow btn-xs btn-sm btn-block ' . $this->cssClass,
                 'data-role' => 'truncate-cart-button',
                 'data-url' => Url::toRoute($this->truncateCartUrl),
             ]);

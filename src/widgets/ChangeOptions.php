@@ -4,6 +4,7 @@ namespace dvizh\cart\widgets;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii;
+use app\models\Utility;
 
 class ChangeOptions extends \yii\base\Widget
 {
@@ -53,7 +54,7 @@ class ChangeOptions extends \yii\base\Widget
                 $optionsArray = ['' => $optionData['name']];
                 if (isset($optionData['variants'])) {
                     foreach ($optionData['variants'] as $variantId => $value) {
-                        $optionsArray[$variantId] = $value;
+                        $optionsArray[$variantId] = Utility::datetimeFormat($value);
                     }
                 }
 
@@ -62,7 +63,8 @@ class ChangeOptions extends \yii\base\Widget
                     $list = Html::dropDownList('cart_options' . $id . '-' . $i,
                         $this->_defaultValue($optionId),
                         $optionsArray,
-                        ['data-href' => Url::toRoute(["/cart/element/update"]), 'data-filter-id' => $optionId, 'data-name' => Html::encode($optionData['name']), 'data-id' => $id, 'class' => "form-control $cssClass"]
+                        ['data-href' => Url::toRoute(["/cart/element/update"]), 'data-filter-id' => $optionId, 'data-name' => Html::encode($optionData['name']), 'data-id' => $id, 'id' => 'select_date',
+                'data-role' => 'product-element-count', 'class' => "form-control $cssClass"]
                     );
                 } else {
                     $list = Html::tag('div', Html::tag('strong', $optionData['name']), ['class' => 'dvizh-option-heading']);

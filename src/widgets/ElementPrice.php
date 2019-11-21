@@ -17,8 +17,9 @@ class ElementPrice extends \yii\base\Widget
     
     public function run()
     {
-        return Html::tag($this->htmlTag, $this->model->price, [
-            'class' => "dvizh-cart-element-price{$this->model->getId()} {$this->cssClass}",
+        $format_price = round($this->model->price);
+        return Html::tag($this->htmlTag, $format_price, [
+            'class' => "cartfull-product-price dvizh-cart-element-price{$this->model->getId()} {$this->cssClass}",
         ]);
     }
 }
